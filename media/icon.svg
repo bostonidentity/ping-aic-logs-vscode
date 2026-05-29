@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Rounded dark-blue background; matches galleryBanner color -->
+  <rect x="0" y="0" width="128" height="128" rx="22" ry="22" fill="#1e3a5f"/>
+
+  <!-- Three log-line bars, right-aligned, decreasing length to suggest list -->
+  <g fill="#9bb6d6" opacity="0.85">
+    <rect x="44" y="34" width="62" height="6" rx="3"/>
+    <rect x="44" y="48" width="48" height="6" rx="3"/>
+    <rect x="44" y="62" width="56" height="6" rx="3"/>
+    <rect x="44" y="76" width="40" height="6" rx="3"/>
+    <rect x="44" y="90" width="52" height="6" rx="3"/>
+  </g>
+
+  <!-- Magnifying glass: white ring + diagonal handle, overlapping the bars -->
+  <g stroke="#ffffff" stroke-linecap="round" fill="none">
+    <circle cx="44" cy="64" r="22" stroke-width="7"/>
+    <line x1="60" y1="80" x2="78" y2="98" stroke-width="9"/>
+  </g>
+
+  <!-- Inner glass tint (subtle, gives a "lens" feel) -->
+  <circle cx="44" cy="64" r="18" fill="#ffffff" opacity="0.10"/>
+
+  <!-- Highlight marker (small green dot on one log line — matches "match found" semantic) -->
+  <circle cx="74" cy="51" r="4" fill="#27ae60"/>
+</svg>

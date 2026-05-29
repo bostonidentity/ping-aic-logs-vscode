@@ -1,0 +1,18 @@
+# Files excluded from the published .vsix package
+.vscode/**
+.github/**
+.claude/**
+CLAUDE.md
+docs/**
+src/**
+**/*.ts
+**/*.map
+.gitignore
+.editorconfig
+esbuild.js
+tsconfig.json
+package-lock.json
+node_modules/**
+out/test/**
+*.vsix
+.eslintrc*

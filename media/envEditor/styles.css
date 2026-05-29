@@ -1,0 +1,104 @@
+:root {
+  --bg: var(--vscode-editor-background);
+  --fg: var(--vscode-foreground);
+  --muted: var(--vscode-descriptionForeground);
+  --border: var(--vscode-panel-border);
+  --accent-fg: var(--vscode-button-foreground);
+  --accent-bg: var(--vscode-button-background);
+  --accent-hover: var(--vscode-button-hoverBackground);
+  --hover: var(--vscode-list-hoverBackground);
+  --error: var(--vscode-errorForeground);
+  --input-bg: var(--vscode-input-background);
+  --focus: var(--vscode-focusBorder);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--fg);
+  background: var(--bg);
+  padding: 24px;
+}
+
+#form {
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+h2 {
+  margin: 0 0 4px;
+  font-size: 1.2em;
+  font-weight: 500;
+}
+
+.hint {
+  color: var(--muted);
+  margin: 0;
+  font-size: 0.9em;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9em;
+  color: var(--muted);
+}
+
+input {
+  height: 28px;
+  padding: 0 8px;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--fg);
+  background: var(--input-bg, var(--bg));
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+input:focus {
+  outline: 1px solid var(--focus);
+  outline-offset: -1px;
+  border-color: var(--focus);
+}
+
+.error {
+  color: var(--error);
+  margin: 0;
+  font-size: 0.9em;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+button {
+  height: 28px;
+  padding: 0 14px;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+button:hover { background: var(--hover); }
+
+button.primary {
+  background: var(--accent-bg);
+  color: var(--accent-fg);
+  border-color: var(--accent-bg);
+}
+
+button.primary:hover {
+  background: var(--accent-hover, var(--accent-bg));
+}

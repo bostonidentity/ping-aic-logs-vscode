@@ -1,0 +1,20 @@
+node_modules/
+out/
+*.vsix
+.DS_Store
+*.log
+
+# VS Code workspace state (keep .vscode/launch.json etc., ignore user-local)
+.vscode/*.local.json
+
+# Cache / runtime data
+.cache/
+search-cache/
+tail-logs/
+
+# IDE / OS
+.idea/
+*.swp
+.env
+.env.*
+.vscode/settings.json

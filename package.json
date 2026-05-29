@@ -1,0 +1,357 @@
+{
+  "name": "ping-aic-logs",
+  "displayName": "Ping AIC Logs",
+  "description": "Search, tail, and analyze PingOne Advanced Identity Cloud (PAIC) logs from inside VS Code. Multi-environment, multi-tab, semantic per-source summaries, diagnostic templates, and embedded-JSON expansion.",
+  "version": "0.1.5",
+  "publisher": "BostonIdentity",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "preview": true,
+  "pricing": "Free",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "pingone",
+    "paic",
+    "forgerock",
+    "identity-cloud",
+    "logs",
+    "log-search",
+    "log-viewer",
+    "log-tail",
+    "ndjson",
+    "queryFilter"
+  ],
+  "galleryBanner": {
+    "color": "#1e3a5f",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bostonidentity/ping-aic-logs-vscode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bostonidentity/ping-aic-logs-vscode/issues"
+  },
+  "homepage": "https://github.com/bostonidentity/ping-aic-logs-vscode#readme",
+  "main": "./out/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "paicLogSearch.openPanel",
+        "title": "PAIC Log Search: Open Search Panel",
+        "category": "PAIC"
+      },
+      {
+        "command": "paicLogSearch.addEnvironment",
+        "title": "PAIC Log Search: Add Environment",
+        "category": "PAIC",
+        "icon": "$(add)"
+      },
+      {
+        "command": "paicLogSearch.editEnvironment",
+        "title": "PAIC Log Search: Edit Environment",
+        "category": "PAIC",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "paicLogSearch.deleteEnvironment",
+        "title": "PAIC Log Search: Delete Environment",
+        "category": "PAIC",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "paicLogSearch.revealTailsFolder",
+        "title": "PAIC Log Search: Reveal Saved Tail Files Folder",
+        "category": "PAIC"
+      },
+      {
+        "command": "paicLogSearch.resetUiPreferences",
+        "title": "PAIC Log Search: Reset UI Preferences",
+        "category": "PAIC"
+      },
+      {
+        "command": "paicLogSearch.openTailFile",
+        "title": "PAIC Log Search: Open Saved Tail File",
+        "category": "PAIC"
+      },
+      {
+        "command": "paicLogSearch.refreshSidebar",
+        "title": "PAIC Log Search: Refresh Sidebar",
+        "category": "PAIC",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "paicLogSearch.runHistory",
+        "title": "Run",
+        "category": "PAIC",
+        "icon": "$(play)"
+      },
+      {
+        "command": "paicLogSearch.runHistoryNewTab",
+        "title": "Run in New Tab",
+        "category": "PAIC",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "paicLogSearch.deleteHistoryEntry",
+        "title": "Delete",
+        "category": "PAIC",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "paicLogSearch.clearAllHistory",
+        "title": "PAIC Log Search: Clear All Search History",
+        "category": "PAIC",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "paicLogSearch.clearZeroResultHistory",
+        "title": "PAIC Log Search: Clear Zero-Result Searches",
+        "category": "PAIC",
+        "icon": "$(circle-slash)"
+      },
+      {
+        "command": "paicLogSearch.revealTailFile",
+        "title": "Reveal in File Explorer",
+        "category": "PAIC",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "paicLogSearch.deleteTailFile",
+        "title": "Delete",
+        "category": "PAIC",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "paicLogSearch.clearAllTailFiles",
+        "title": "PAIC Log Search: Clear All Saved Tail Files",
+        "category": "PAIC",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "paicLogSearch.importEnvironments",
+        "title": "PAIC Log Search: Import Environments from JSON…",
+        "category": "PAIC",
+        "icon": "$(cloud-upload)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "paic-log-search",
+          "title": "PAIC Log Search",
+          "icon": "$(search)"
+        }
+      ]
+    },
+    "views": {
+      "paic-log-search": [
+        {
+          "id": "paicLogSearch.environments",
+          "name": "Environments",
+          "icon": "$(server-environment)",
+          "contextualTitle": "PAIC Environments"
+        },
+        {
+          "id": "paicLogSearch.recentSearches",
+          "name": "Recent Searches",
+          "icon": "$(history)",
+          "contextualTitle": "Recent Searches"
+        },
+        {
+          "id": "paicLogSearch.tailFiles",
+          "name": "Saved Tail Files",
+          "icon": "$(archive)",
+          "contextualTitle": "Saved Tail Files"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "paicLogSearch.addEnvironment",
+          "when": "view == paicLogSearch.environments",
+          "group": "navigation"
+        },
+        {
+          "command": "paicLogSearch.importEnvironments",
+          "when": "view == paicLogSearch.environments",
+          "group": "navigation"
+        },
+        {
+          "command": "paicLogSearch.refreshSidebar",
+          "when": "view == paicLogSearch.recentSearches || view == paicLogSearch.tailFiles",
+          "group": "navigation"
+        },
+        {
+          "command": "paicLogSearch.clearZeroResultHistory",
+          "when": "view == paicLogSearch.recentSearches",
+          "group": "navigation@1"
+        },
+        {
+          "command": "paicLogSearch.clearAllHistory",
+          "when": "view == paicLogSearch.recentSearches",
+          "group": "navigation@2"
+        },
+        {
+          "command": "paicLogSearch.clearAllTailFiles",
+          "when": "view == paicLogSearch.tailFiles",
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "paicLogSearch.editEnvironment",
+          "when": "view == paicLogSearch.environments && viewItem == environment",
+          "group": "inline"
+        },
+        {
+          "command": "paicLogSearch.deleteEnvironment",
+          "when": "view == paicLogSearch.environments && viewItem == environment",
+          "group": "inline"
+        },
+        {
+          "command": "paicLogSearch.runHistory",
+          "when": "view == paicLogSearch.recentSearches && viewItem == recentSearch",
+          "group": "inline@1"
+        },
+        {
+          "command": "paicLogSearch.runHistoryNewTab",
+          "when": "view == paicLogSearch.recentSearches && viewItem == recentSearch",
+          "group": "inline@2"
+        },
+        {
+          "command": "paicLogSearch.deleteHistoryEntry",
+          "when": "view == paicLogSearch.recentSearches && viewItem == recentSearch",
+          "group": "inline@3"
+        },
+        {
+          "command": "paicLogSearch.revealTailFile",
+          "when": "view == paicLogSearch.tailFiles && viewItem == tailFile",
+          "group": "inline@1"
+        },
+        {
+          "command": "paicLogSearch.deleteTailFile",
+          "when": "view == paicLogSearch.tailFiles && viewItem == tailFile",
+          "group": "inline@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "PAIC Log Search",
+      "properties": {
+        "paicLogSearch.environments": {
+          "type": "array",
+          "default": [],
+          "description": "List of PAIC tenants. Sensitive credentials (key/secret) are stored in VS Code SecretStorage, not here.",
+          "items": {
+            "type": "object",
+            "required": ["name", "url"],
+            "properties": {
+              "name": { "type": "string", "description": "Display name (e.g. UAT, PROD)" },
+              "url": { "type": "string", "description": "Tenant base URL (e.g. https://your-tenant.forgeblocks.com)" }
+            }
+          }
+        },
+        "paicLogSearch.defaultPageSize": {
+          "type": "integer",
+          "default": 100,
+          "minimum": 10,
+          "maximum": 5000,
+          "description": "Initial page size used by new search panels. Built-in dropdown options are 100/250/500/1000; values outside the dropdown are added as a custom option at panel start."
+        },
+        "paicLogSearch.tailFileCap": {
+          "type": "integer",
+          "default": 20,
+          "minimum": 1,
+          "maximum": 500,
+          "description": "Maximum number of saved tail-stream files kept under globalStorage/tails/. When the cap is exceeded, the oldest (by start time) are evicted FIFO."
+        },
+        "paicLogSearch.tailPollInterval": {
+          "type": "integer",
+          "default": 1000,
+          "minimum": 500,
+          "maximum": 60000,
+          "description": "Tail polling interval in milliseconds. PAIC's tail endpoint returns everything accumulated since the last cursor, so this also controls per-batch size. Lower values mean smaller batches arriving more frequently (lower perceived latency on high-traffic tenants). Range 500-60000."
+        },
+        "paicLogSearch.maxRowsPerSearch": {
+          "type": "integer",
+          "default": 50000,
+          "minimum": 100,
+          "maximum": 500000,
+          "description": "Hard upper bound on total rows fetched per search across all paginated pages. The host enforces this cap regardless of what the webview requests."
+        },
+        "paicLogSearch.searchHistoryLimit": {
+          "type": "integer",
+          "default": 100,
+          "minimum": 10,
+          "maximum": 1000,
+          "description": "Maximum number of search history entries kept in VS Code globalState. Older entries are dropped FIFO."
+        },
+        "paicLogSearch.largeQueryThresholdMinutes": {
+          "type": "integer",
+          "default": 30,
+          "minimum": 0,
+          "maximum": 1440,
+          "description": "If a search has no keyword and the time range exceeds this many minutes, the user is prompted before the query fires. Set to 0 to disable the gate. Range 0-1440 (minutes)."
+        },
+        "paicLogSearch.tailAutoSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, tail streams are persisted to globalStorage/tails/ for later replay. When false, tails are fully ephemeral and never write to disk."
+        },
+        "paicLogSearch.highlightRules": {
+          "type": "array",
+          "default": [],
+          "description": "Override the built-in keyword highlight rules applied to log payloads. An empty array uses the built-in defaults.",
+          "items": {
+            "type": "object",
+            "required": ["pattern", "color"],
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "Regex source string (compiled with the global flag)."
+              },
+              "color": {
+                "type": "string",
+                "description": "Any valid CSS color (e.g. #5cb85c, red, rgb(...))."
+              },
+              "fontWeight": {
+                "description": "Optional CSS font-weight applied to matches.",
+                "oneOf": [
+                  { "type": "string", "enum": ["normal", "bold"] },
+                  { "type": "integer", "enum": [600, 700] }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production",
+    "pretest": "tsc --noEmit && npm run compile",
+    "test": "node --test out/test/**/*.test.js",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.x",
+    "@typescript-eslint/parser": "^7.x",
+    "esbuild": "^0.20.x",
+    "eslint": "^8.x",
+    "typescript": "^5.x"
+  }
+}
