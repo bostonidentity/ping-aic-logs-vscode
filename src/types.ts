@@ -64,6 +64,16 @@ export interface HistoryEntry {
   totalCount?: number;
 }
 
+/** Cloned-session payload — used to fork a search panel without re-querying
+ *  PAIC. Includes the form fields (so the new panel's UI matches the
+ *  source's) plus the full entry list and counts. */
+export interface ClonedSession {
+  formEntry: HistoryEntry;
+  entries: LogEntry[];
+  totalCount: number;
+  truncated: boolean;
+}
+
 /** Subset of user-configurable settings forwarded to the webview at init. */
 export interface PaicHighlightRule {
   pattern: string;
@@ -108,7 +118,9 @@ export type WebviewToHostMessage =
   | { type: 'listTailFiles' }
   | { type: 'loadTailFile'; payload: { name: string } }
   | { type: 'deleteTailFile'; payload: { name: string } }
-  | { type: 'setTitle'; payload: { env?: string; count?: number; tail?: boolean } };
+  | { type: 'setTitle'; payload: { env?: string; count?: number; tail?: boolean } }
+  | { type: 'openPanelWithSearch'; payload: HistoryEntry }
+  | { type: 'cloneCurrentToNewPanel'; payload: ClonedSession };
 
 /* ───────── Host → Webview ───────── */
 
@@ -126,6 +138,8 @@ export type HostToWebviewMessage =
   | { type: 'savedResults'; payload: { path: string; count: number } }
   | { type: 'setInitialEnv'; payload: { env: string } }
   | { type: 'restoreSearch'; payload: HistoryEntry }
+  | { type: 'cloneSession'; payload: ClonedSession }
+  | { type: 'triggerDuplicate' }
   | { type: 'config'; payload: PaicConfig }
   | { type: 'resetPreferences' }
   | { type: 'error'; payload: { message: string; context?: string } };

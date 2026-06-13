@@ -8,7 +8,16 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 (empty)
 
-## [0.1.5] — 2026-05-28
+## [0.1.6] — 2026-06-13
+
+### Added
+- Click any row's `T` badge (shown when the entry has a `payload.transactionId`) to open a new tab searching that transactionId across idm/am everything, ±60s around the entry's timestamp. Hover shows the full id.
+- Tab right-click → `Duplicate (clone results, no re-search)` — forks the current panel into a new tab with the same entries already loaded so you can filter independently without hitting PAIC again.
+- Real-time warning when the configured time range exceeds 24 hours — input fields get an orange border the moment the span crosses the threshold. A confirm dialog still appears at Search time.
+- Time inputs default to "now" on panel open; end-time auto-seeds from begin-time when first focused empty; changing the begin date updates end's date portion (preserving time-of-day).
+
+### Changed
+- `History` button hidden from the search bar (functionality retained internally; can be re-enabled if needed).
 
 ### Added
 - Saved Tail Files sidebar: inline `Reveal in File Explorer` button (uses VS Code's `revealFileInOS` — Finder on macOS, Explorer on Windows).
@@ -125,7 +134,8 @@ Initial public release.
 - Credentials only flow webview→host (one-way), via dedicated env-editor webview; search panel never receives credentials.
 - No telemetry, no analytics, no third-party connections.
 
-[Unreleased]: https://github.com/bostonidentity/ping-aic-logs-vscode/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/bostonidentity/ping-aic-logs-vscode/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/bostonidentity/ping-aic-logs-vscode/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/bostonidentity/ping-aic-logs-vscode/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/bostonidentity/ping-aic-logs-vscode/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/bostonidentity/ping-aic-logs-vscode/compare/v0.1.2...v0.1.3

@@ -2,7 +2,7 @@
   "name": "ping-aic-logs",
   "displayName": "Ping AIC Logs",
   "description": "Search, tail, and analyze PingOne Advanced Identity Cloud (PAIC) logs from inside VS Code. Multi-environment, multi-tab, semantic per-source summaries, diagnostic templates, and embedded-JSON expansion.",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "publisher": "BostonIdentity",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -123,6 +123,11 @@
         "icon": "$(folder-opened)"
       },
       {
+        "command": "paicLogSearch.duplicateActivePanel",
+        "title": "Duplicate (clone results, no re-search)",
+        "category": "PAIC"
+      },
+      {
         "command": "paicLogSearch.deleteTailFile",
         "title": "Delete",
         "category": "PAIC",
@@ -240,6 +245,13 @@
           "command": "paicLogSearch.deleteTailFile",
           "when": "view == paicLogSearch.tailFiles && viewItem == tailFile",
           "group": "inline@2"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "paicLogSearch.duplicateActivePanel",
+          "when": "activeWebviewPanelId == pingAicLogs.searchPanel",
+          "group": "1_close@99"
         }
       ]
     },

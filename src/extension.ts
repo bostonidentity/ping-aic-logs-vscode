@@ -63,6 +63,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })
   );
 
+  // Duplicate the currently-active PAIC search panel (tab right-click → Duplicate).
+  context.subscriptions.push(
+    vscode.commands.registerCommand('paicLogSearch.duplicateActivePanel', () => {
+      for (const p of LogSearchPanel.allInstances()) {
+        if (p.isActive) { p.postMessage({ type: 'triggerDuplicate' }); return; }
+      }
+      vscode.window.showWarningMessage('No active PAIC log panel to duplicate.');
+    })
+  );
+
   // Open a saved tail file in a new panel (called by Saved Tail Files tree)
   context.subscriptions.push(
     vscode.commands.registerCommand(

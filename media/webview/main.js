@@ -149,6 +149,7 @@
       const mode = btn.getAttribute('data-mode');
       $('time-' + mode).classList.add('active');
       state.timeMode = mode;
+      updateRangeWarning();
     });
   });
 
@@ -156,6 +157,7 @@
     btn.addEventListener('click', () => {
       recentVal.value = btn.getAttribute('data-val');
       recentUnit.value = btn.getAttribute('data-unit');
+      updateRangeWarning();
     });
   });
 
@@ -179,6 +181,45 @@
       }
     });
   });
+
+  // Seed range-end with range-begin when user moves to it empty.
+  rangeEnd.addEventListener('focus', () => {
+    if (!rangeEnd.value && rangeBegin.value) rangeEnd.value = rangeBegin.value;
+  });
+
+  // Real-time visual warning when the configured time range exceeds 24h.
+  function updateRangeWarning() {
+    const range = getTimeRange();
+    const over = !!(range && (new Date(range.end).getTime() - new Date(range.begin).getTime()) > 24 * 3600 * 1000);
+    [rangeBegin, rangeEnd, recentVal, aroundCenter, aroundWindow].forEach((el) => {
+      if (el) el.classList.toggle('over-24h', over);
+    });
+  }
+  [rangeBegin, rangeEnd, recentVal, recentUnit, aroundCenter, aroundWindow, aroundUnit, aroundDir].forEach((el) => {
+    if (!el) return;
+    el.addEventListener('input', updateRangeWarning);
+    el.addEventListener('change', updateRangeWarning);
+  });
+
+  // When the user changes range-begin's date, sync the date portion of
+  // range-end to match (preserves end's time-of-day).
+  rangeBegin.addEventListener('change', () => {
+    const bv = rangeBegin.value;
+    const ev = rangeEnd.value;
+    if (bv && ev && bv.length >= 10 && ev.length >= 10 && bv.slice(0, 10) !== ev.slice(0, 10)) {
+      rangeEnd.value = bv.slice(0, 10) + ev.slice(10);
+    }
+  });
+
+  // Default all datetime inputs to "now" on panel init (overridable by
+  // restoreFormState if the panel was opened from a sidebar history entry).
+  (function seedNowIfEmpty() {
+    const now = toLocalDT(new Date());
+    if (!rangeBegin.value) rangeBegin.value = now;
+    if (!rangeEnd.value) rangeEnd.value = now;
+    if (!aroundCenter.value) aroundCenter.value = now;
+  })();
+  updateRangeWarning();
 
   // ── Source picker ────────────────────────────────────────────────────────
   sourceToggle.addEventListener('click', (e) => {
@@ -412,12 +453,18 @@
     const range = getTimeRange();
     if (!range) { setStatus('Pick a valid time range.'); return; }
 
-    // Large-query guard: no keyword + range > N minutes — confirm before firing.
-    // N is `paicLogSearch.largeQueryThresholdMinutes` (default 30, 0 disables).
+    // Large-query guards. >24h always prompts (broad data warning); below
+    // that, fall back to the keyword-less threshold check.
     const thresholdMin = (typeof state.largeQueryThresholdMinutes === 'number')
       ? state.largeQueryThresholdMinutes : 30;
     const rangeSec = (new Date(range.end).getTime() - new Date(range.begin).getTime()) / 1000;
-    if (thresholdMin > 0 && !queryInp.value.trim() && rangeSec > thresholdMin * 60) {
+    if (rangeSec > 24 * 3600) {
+      const hours = (rangeSec / 3600).toFixed(1);
+      const ok = await showConfirm(
+        'Time range spans ' + hours + ' hours — that\'s a lot of data. Continue?'
+      );
+      if (!ok) { setStatus('Search cancelled.'); return; }
+    } else if (thresholdMin > 0 && !queryInp.value.trim() && rangeSec > thresholdMin * 60) {
       const minutes = Math.round(rangeSec / 60);
       const ok = await showConfirm(
         'Searching ' + minutes + ' minutes without a keyword can return many results and may take a while. Continue?'
@@ -485,6 +532,47 @@
     const atBottom = (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 50);
     state.tailAutoScroll = atBottom;
   });
+
+  // ── Open new tab pre-filled (Duplicate + transactionId badge) ───────────
+  function openTransactionIdInNewTab(entry) {
+    const txId = entry && entry.payload && entry.payload.transactionId;
+    if (!txId || !envSel.value || !entry.timestamp) { setStatus('Cannot open tab — missing env or timestamp.'); return; }
+    const centerMs = new Date(entry.timestamp).getTime();
+    const windowMs = 60 * 1000;
+    send({
+      type: 'openPanelWithSearch',
+      payload: {
+        timestamp: Date.now(),
+        env: envSel.value,
+        source: 'idm-everything,am-everything',
+        query: String(txId),
+        begin: new Date(centerMs - windowMs).toISOString(),
+        end: new Date(centerMs + windowMs).toISOString()
+      }
+    });
+  }
+  function duplicateCurrentPanel() {
+    const sources = getSelectedSources();
+    if (!envSel.value || !sources.length) { setStatus('Fill the search form first.'); return; }
+    if (!state.allEntries || !state.allEntries.length) { setStatus('No results to duplicate yet — run a search first.'); return; }
+    const range = getTimeRange();
+    send({
+      type: 'cloneCurrentToNewPanel',
+      payload: {
+        formEntry: {
+          timestamp: Date.now(),
+          env: envSel.value,
+          source: sources.join(','),
+          query: queryInp.value.trim(),
+          begin: range ? range.begin : undefined,
+          end: range ? range.end : undefined
+        },
+        entries: state.allEntries,
+        totalCount: state.totalCount || state.allEntries.length,
+        truncated: !!state.truncated
+      }
+    });
+  }
 
   // ── CLI button ──────────────────────────────────────────────────────────
   async function copyCliToClipboard() {
@@ -1225,6 +1313,18 @@
           applyLocalFilters();
         });
         c4.appendChild(badge);
+      }
+      const txId = entry.payload && typeof entry.payload === 'object' ? entry.payload.transactionId : null;
+      if (txId) {
+        const txBadge = document.createElement('span');
+        txBadge.className = 'tx-badge';
+        txBadge.textContent = 'T';
+        txBadge.title = 'transactionId: ' + txId + '  (click to open new tab with this transactionId)';
+        txBadge.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          openTransactionIdInNewTab(entry);
+        });
+        c4.appendChild(txBadge);
       }
       const payloadSpan = document.createElement('span');
       payloadSpan.textContent = state.rawJsonMode ? summarizeRaw(entry) : summarize(entry);
@@ -2375,6 +2475,27 @@
         applyHistoryEntry(msg.payload);
         doSearch();
         break;
+      case 'triggerDuplicate':
+        duplicateCurrentPanel();
+        break;
+      case 'cloneSession': {
+        // Duplicate from another panel: fill the form, inject the cloned
+        // entries, do NOT re-fetch from PAIC.
+        const cs = msg.payload || {};
+        if (cs.formEntry) applyHistoryEntry(cs.formEntry);
+        state.sessionId = 'cloned-' + Date.now();
+        state.allEntries = (cs.entries || []).slice();
+        state.totalCount = typeof cs.totalCount === 'number' ? cs.totalCount : state.allEntries.length;
+        state.truncated = !!cs.truncated;
+        state.page = 0;
+        applyLocalFilters();
+        applyTimeSort();
+        renderTable();
+        showToolbar(state.allEntries.length > 0);
+        setStatus('Cloned from previous tab — filter freely without re-searching.');
+        sendTitle();
+        break;
+      }
       case 'sourceList': /* HTML hardcoded for now */ break;
       case 'searchResult':
       case 'pageResult': {

@@ -22,6 +22,8 @@ body { font-family: var(--mono); background: var(--bg); color: var(--text); font
 .search-bar select:focus, .search-bar input:focus { outline: none; border-color: var(--vscode-focusBorder); box-shadow: 0 0 0 2px var(--accent-soft); }
 .search-bar input.query-input { width: 180px; }
 .search-bar input[type="datetime-local"] { width: 215px; font-size: 11px; cursor: text; }
+.search-bar input.over-24h, .search-bar select.over-24h { border-color: #e0a800 !important; background-color: rgba(224, 168, 0, 0.12); box-shadow: 0 0 0 1px #e0a800 inset; }
+.search-bar input.over-24h:focus, .search-bar select.over-24h:focus { box-shadow: 0 0 0 2px rgba(224, 168, 0, 0.4); }
 .search-bar input[type="datetime-local"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
 .search-bar input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 body.vscode-dark .search-bar input[type="datetime-local"]::-webkit-calendar-picker-indicator,
@@ -42,6 +44,8 @@ body.vscode-high-contrast .search-bar input[type="datetime-local"]::-webkit-cale
 .btn.copied { background: var(--success, #27ae60) !important; color: #fff !important; border-color: var(--success, #27ae60) !important; font-weight: 700; }
 .btn.active:hover { background: var(--accent-hover, var(--accent)); border-color: var(--accent-hover, var(--accent)); }
 .dedup-count { display: inline-block; background: var(--accent); color: var(--vscode-button-foreground, #fff); border-radius: var(--radius-sm, 3px); padding: 0 6px; font-weight: 700; font-size: 11px; margin-right: 6px; min-width: 18px; text-align: center; font-family: var(--sans); }
+.tx-badge { display: inline-block; background: #7e57c2; color: #fff; border-radius: var(--radius-sm, 3px); padding: 0 5px; font-weight: 700; font-size: 10px; margin-right: 6px; min-width: 14px; text-align: center; font-family: var(--sans); cursor: pointer; line-height: 16px; }
+.tx-badge:hover { background: #5e35b1; }
 .btn-primary { background: var(--vscode-button-background); color: var(--vscode-button-foreground); border-color: var(--vscode-button-background); }
 .btn-primary:hover { background: var(--vscode-button-hoverBackground); border-color: var(--vscode-button-hoverBackground); }
 .btn:disabled { opacity: 0.35; cursor: not-allowed; }

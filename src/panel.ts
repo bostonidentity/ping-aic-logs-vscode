@@ -5,6 +5,7 @@ import { ConfigStore } from './config';
 import { HistoryStore, SearchSessionCache } from './history';
 import { PaicClient } from './paicClient';
 import {
+  ClonedSession,
   HistoryEntry,
   HostToWebviewMessage,
   LogEntry,
@@ -65,7 +66,8 @@ export class LogSearchPanel {
     private readonly historyStore: HistoryStore,
     private readonly initialEnv?: string,
     private readonly initialTailFile?: string,
-    private readonly initialSearchEntry?: HistoryEntry
+    private readonly initialSearchEntry?: HistoryEntry,
+    private readonly initialClonedSession?: ClonedSession
   ) {
     LogSearchPanel.instances.add(this);
     this.panel.webview.html = this.renderHtml();
@@ -87,7 +89,8 @@ export class LogSearchPanel {
     historyStore: HistoryStore,
     envName?: string,
     initialTailFile?: string,
-    initialSearchEntry?: HistoryEntry
+    initialSearchEntry?: HistoryEntry,
+    initialClonedSession?: ClonedSession
   ): LogSearchPanel {
     const column = vscode.window.activeTextEditor?.viewColumn ?? vscode.ViewColumn.One;
     const title = envName ? envName : 'Ping AIC Logs';
@@ -96,7 +99,7 @@ export class LogSearchPanel {
       retainContextWhenHidden: true,
       localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'media')]
     });
-    return new LogSearchPanel(panel, context, configStore, historyStore, envName, initialTailFile, initialSearchEntry);
+    return new LogSearchPanel(panel, context, configStore, historyStore, envName, initialTailFile, initialSearchEntry, initialClonedSession);
   }
 
   private async handleMessage(msg: WebviewToHostMessage): Promise<void> {
@@ -123,6 +126,11 @@ export class LogSearchPanel {
           if (this.initialSearchEntry) {
             await this.send({ type: 'restoreSearch', payload: this.initialSearchEntry });
           }
+          // If the panel was opened as a Duplicate of another panel, push the
+          // cloned form + entries — no PAIC round-trip.
+          if (this.initialClonedSession) {
+            await this.send({ type: 'cloneSession', payload: this.initialClonedSession });
+          }
           // If the panel was opened from the "Saved Tail Files" sidebar
           // entry, auto-load that tail file content right after init.
           if (this.initialTailFile) {
@@ -135,6 +143,23 @@ export class LogSearchPanel {
           const { env, count, tail } = msg.payload;
           this.currentEnv = env;
           this.panel.title = formatPanelTitle(env, count, tail);
+          return;
+        }
+
+        case 'openPanelWithSearch': {
+          const entry = msg.payload;
+          if (!entry || !entry.env) return;
+          LogSearchPanel.create(this.context, this.configStore, this.historyStore, entry.env, undefined, entry);
+          return;
+        }
+
+        case 'cloneCurrentToNewPanel': {
+          const session = msg.payload;
+          if (!session || !session.formEntry || !session.formEntry.env) return;
+          LogSearchPanel.create(
+            this.context, this.configStore, this.historyStore,
+            session.formEntry.env, undefined, undefined, session
+          );
           return;
         }
 
@@ -584,7 +609,7 @@ export class LogSearchPanel {
     </div>
   </span>
   <div class="history-dropdown" style="display:flex;gap:4px;align-items:center;">
-    <button class="btn btn-sm" id="historyBtn" title="Search history &amp; Tail logs">History</button>
+    <button class="btn btn-sm" id="historyBtn" title="Search history &amp; Tail logs" style="display:none;">History</button>
     <button class="btn btn-sm" id="helpBtn" title="Usage guide &amp; quick searches" style="font-size:13px;padding:1px 5px;">?</button>
     <div class="history-menu" id="history-menu"></div>
     <div class="history-menu" id="tail-hist-menu"></div>
